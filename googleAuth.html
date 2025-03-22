@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Authentication App</title>
+</head>
+<body>
+  <button id="signInButton">Create Account / Sign In</button>
+  <button id="signOutButton">Sign Out</button>
+
+  <div id="message">
+    <p>You have signed in as <span id="userName"></span> with the email <span id="userEmail"></span> </p>
+  </div>
+
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyA8jrldSJ9oA2zyODcQ6fVMRhtmz3kw2vE",
+      authDomain: "login-828e2.firebaseapp.com",
+      projectId: "login-828e2",
+      storageBucket: "login-828e2.firebasestorage.app",
+      messagingSenderId: "300953596613",
+      appId: "1:300953596613:web:8a22f9a7f7051a5892f6ac"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+    
+    //refer to html elements using variables below 
+    const signInButton = document.getElementById("signInButton");
+    const signOutButton = document.getElementById("signOutButton");
+    const message = document.getElementById("message");
+    const userName = document.getElementById("userName");
+    const userEmail = document.getElementById("userEmail");
+
+    //hide signout button and message 
+    signOutButton.style.display = "none";
+    message.style.display = "none";
+
+    //asynchronous function runs the block of code when function is called
+    const userSignIn = async() => {
+      signInWithPopup(auth, provider)
+      .then((result) => {
+        //result is data from google 
+        const user = result.user;
+        console.log(user);
+
+      }).catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      })
+    }
+
+
+    //signout function 
+    const userSignOut = async() => {
+      signOut(auth).then(()=>{
+        alert("You have signed out")
+      }).catch((error) => {
+        console.log(error.message);
+      })
+    }
+
+    //checks authentication state 
+    onAuthStateChanged(auth, (user)=>{
+      if (user) {
+        signOutButton.style.display = "block"; //show signout button if user signed in
+        message.style.display = "block";
+        userName.innerHTML = user.displayName;
+        userEmail.innerHTML = user.email;
+
+      }
+      else{
+        signOutButton.style.display = "none"; //show signout button if user signed in
+        message.style.display = "none";
+      }
+
+    })
+
+    //if user clicks buttons, add event listeners to run functions
+    signInButton.addEventListener('click', userSignIn);
+    signOutButton.addEventListener('click', userSignOut);
+
+  </script>
+</body>
+</html>
